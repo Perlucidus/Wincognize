@@ -12,7 +12,8 @@ namespace Wincognize.Data
         private const string FileName = "data.sqlite";
         private const int SqliteVersion = 3;
 
-        private string m_connection;
+        //private string m_connection;
+        private SQLiteConnection m_connection;
 
         static Database()
         {
@@ -26,12 +27,22 @@ namespace Wincognize.Data
             Directory.CreateDirectory(dir);
             if (!File.Exists(path))
                 SQLiteConnection.CreateFile(path);
-            m_connection = $"Data Source={path};Version={SqliteVersion};";
+            //m_connection = $"Data Source={path};Version={SqliteVersion};";
+            m_connection = new SQLiteConnection($"Data Source={path};Version={SqliteVersion};");
+            m_connection.Open();
         }
 
-        public DataConnection CreateConnection()
+        public PreparedStatement PrepareStatement(string ps)
         {
-            return new DataConnection(m_connection);
+            //using (SQLiteConnection connection = new SQLiteConnection(m_connection))
+            //    return new PreparedStatement(connection, ps);
+            return new PreparedStatement(m_connection, ps);
+        }
+
+        public void ExecuteNonQuery(string sql)
+        {
+            using (PreparedStatement ps = PrepareStatement(sql))
+                ps.ExecuteNonQuery();
         }
     }
 }

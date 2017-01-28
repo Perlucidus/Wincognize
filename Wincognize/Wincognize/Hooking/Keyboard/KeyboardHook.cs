@@ -7,36 +7,32 @@ namespace Wincognize.Hooking.Keyboard
 {
     public class KeyboardHook
     {
-        public class KeyEventArgs : EventArgs
-        {
-            public KeyboardAction Action;
-            public KeyEvent Data;
-        }
-
-        public event EventHandler<KeyEventArgs> KeyboardAction;
+        public delegate void KeyboardProcCallback(KeyboardAction wParam, KeyboardProc lParam);
 
         private IntPtr m_hhook;
         private HookProc m_hookProc;
+        private KeyboardProcCallback m_callback;
 
-        public KeyboardHook()
+        public KeyboardHook(KeyboardProcCallback callback)
         {
             m_hhook = IntPtr.Zero;
             m_hookProc = LLKeyboardProc;
+            m_callback = callback;
         }
 
-        public void Start()
+        public void Hook()
         {
-            if (m_hhook != IntPtr.Zero)
-                return;
+            if (m_hhook == IntPtr.Zero)
             m_hhook = SetHook(m_hookProc);
         }
 
-        public void Stop()
+        public void Unhook()
         {
-            if (m_hhook == IntPtr.Zero)
-                return;
-            UnhookWindowsHookEx(m_hhook);
-            m_hhook = IntPtr.Zero;
+            if (m_hhook != IntPtr.Zero)
+            {
+                UnhookWindowsHookEx(m_hhook);
+                m_hhook = IntPtr.Zero;
+            }
         }
 
         private IntPtr SetHook(HookProc lpfn)
@@ -50,14 +46,9 @@ namespace Wincognize.Hooking.Keyboard
         {
             if (nCode >= 0)
             {
-                KeyEventArgs eventArgs = new KeyEventArgs
-                {
-                    Action = (KeyboardAction)wParam.ToInt32(),
-                    Data = Marshal.PtrToStructure<KeyEvent>(lParam)
-                };
                 try
                 {
-                    KeyboardAction?.Invoke(this, eventArgs);
+                    m_callback((KeyboardAction)wParam.ToInt32(), Marshal.PtrToStructure<KeyboardProc>(lParam));
                 }
                 catch (Exception ex)
                 {

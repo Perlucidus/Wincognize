@@ -1,27 +1,40 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Forms;
-using Wincognize.Data;
+using Wincognize.Tracking;
 
 namespace Wincognize
 {
     public class Context : ApplicationContext
     {
+        private List<Tracker> m_trackers;
+
         public Context()
         {
             Application.ApplicationExit += OnApplicationExit;
-            /*using (DataConnection connection = Database.Instance.CreateConnection())
-            {
-                //connection.ExecuteNonQuery("create table test1(s varchar(20))");
-                //connection.ExecuteNonQuery("insert into test1 (s) values ('a')");
-                using (ResultSet rs = connection.ExecuteQuery("select * from test1"))
-                    while (rs.NextRow())
-                        Console.WriteLine(rs.Get<string>("s"));
-            }*/
+            Application.ThreadException += OnThreadException;
+            InitializeTrackers();
+        }
+
+        private void InitializeTrackers()
+        {
+            m_trackers = new List<Tracker>();
+            m_trackers.Add(new MouseTracker());
+            m_trackers.Add(new KeyboardTracker());
+            m_trackers.ForEach(t => t.Enable());
+        }
+
+        private void OnThreadException(Object sender, ThreadExceptionEventArgs e)
+        {
+            Console.WriteLine($"Thread exception: {e}");
         }
 
         private void OnApplicationExit(Object sender, EventArgs e)
         {
             Console.WriteLine("Application Exit");
+            m_trackers.ForEach(t => t.Disable());
+            m_trackers.Clear();
         }
     }
 }

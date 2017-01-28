@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Wincognize.Hooking.Mouse
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct MouseEvent
+    public struct MouseProc
     {
         public POINT Location;
         public uint Data;

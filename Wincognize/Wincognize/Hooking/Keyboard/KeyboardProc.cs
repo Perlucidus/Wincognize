@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Wincognize.Hooking.Keyboard
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct KeyEvent
+    public struct KeyboardProc
     {
         public uint VirtualKeyCode;
         public uint HardwareScanCode;

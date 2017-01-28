@@ -7,35 +7,32 @@ namespace Wincognize.Hooking.Mouse
 {
     public class MouseHook
     {
-        public class MouseEventArgs : EventArgs
-        {
-            public MouseAction Action;
-            public MouseEvent Data;
-        }
-        public event EventHandler<MouseEventArgs> MouseAction;
+        public delegate void MouseProcCallback(MouseAction wParam, MouseProc lParam);
 
         private IntPtr m_hhook;
         private HookProc m_hookProc;
+        private MouseProcCallback m_callback;
 
-        public MouseHook()
+        public MouseHook(MouseProcCallback callback)
         {
             m_hhook = IntPtr.Zero;
             m_hookProc = LLMouseProc;
+            m_callback = callback;
         }
 
-        public void Start()
-        {
-            if (m_hhook != IntPtr.Zero)
-                return;
-            m_hhook = SetHook(m_hookProc);
-        }
-
-        public void Stop()
+        public void Hook()
         {
             if (m_hhook == IntPtr.Zero)
-                return;
-            UnhookWindowsHookEx(m_hhook);
-            m_hhook = IntPtr.Zero;
+                m_hhook = SetHook(m_hookProc);
+        }
+
+        public void Unhook()
+        {
+            if (m_hhook != IntPtr.Zero)
+            {
+                UnhookWindowsHookEx(m_hhook);
+                m_hhook = IntPtr.Zero;
+            }
         }
 
         private IntPtr SetHook(HookProc lpfn)
@@ -49,14 +46,9 @@ namespace Wincognize.Hooking.Mouse
         {
             if (nCode >= 0)
             {
-                MouseEventArgs eventArgs = new MouseEventArgs
-                {
-                    Action = (MouseAction)wParam.ToInt32(),
-                    Data = Marshal.PtrToStructure<MouseEvent>(lParam)
-                };
                 try
                 {
-                    MouseAction?.Invoke(this, eventArgs);
+                    m_callback((MouseAction)wParam.ToInt32(), Marshal.PtrToStructure<MouseProc>(lParam));
                 }
                 catch (Exception ex)
                 {
