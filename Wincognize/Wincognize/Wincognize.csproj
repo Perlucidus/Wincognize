@@ -59,16 +59,19 @@
     <Compile Include="Hooking\HookAPI.cs" />
     <Compile Include="Hooking\Keyboard\KeyboardAction.cs" />
     <Compile Include="Hooking\Keyboard\KeyboardHook.cs" />
-    <Compile Include="Hooking\Keyboard\KeyEvent.cs" />
+    <Compile Include="Hooking\Keyboard\KeyboardProc.cs" />
     <Compile Include="Hooking\Keyboard\KeyState.cs" />
     <Compile Include="Hooking\Mouse\MouseAction.cs" />
-    <Compile Include="Hooking\Mouse\MouseEvent.cs" />
+    <Compile Include="Hooking\Mouse\MouseProc.cs" />
     <Compile Include="Hooking\Mouse\MouseHook.cs" />
     <Compile Include="Hooking\Mouse\MouseState.cs" />
     <Compile Include="Hooking\Mouse\POINT.cs" />
     <Compile Include="Hooking\WindowsHook.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tracking\KeyboardTracker.cs" />
+    <Compile Include="Tracking\MouseTracker.cs" />
+    <Compile Include="Tracking\Tracker.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

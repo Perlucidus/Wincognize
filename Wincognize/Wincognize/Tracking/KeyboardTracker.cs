@@ -12,6 +12,8 @@ namespace Wincognize.Tracking
             m_hook = new KeyboardHook(KeyboardProcCallback);
         }
 
+        #region Tracker Implementation
+
         protected override void DisposeManaged() { }
 
         protected override void DisposeUnmanaged()
@@ -23,9 +25,11 @@ namespace Wincognize.Tracking
 
         protected override void PEnable() { }
 
+        #endregion
+
         private void KeyboardProcCallback(KeyboardAction wParam, KeyboardProc lParam)
         {
-            Database.Instance.ExecuteNonQuery($@"
+            Database.Main.ExecuteNonQuery($@"
                 INSERT INTO Keyboard (action, vkCode, hwsCode, flags, timestamp, extrainfo)
                 VALUES ({wParam}, {lParam.VirtualKeyCode}, {lParam.HardwareScanCode}, {lParam.Flags}, {lParam.Timestamp}, {lParam.ExtraInfo})
             ");

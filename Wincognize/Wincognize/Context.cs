@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using Wincognize.Data;
 using Wincognize.Tracking;
 
 namespace Wincognize
@@ -14,7 +16,7 @@ namespace Wincognize
         {
             Application.ApplicationExit += OnApplicationExit;
             Application.ThreadException += OnThreadException;
-            InitializeTrackers();
+            //InitializeTrackers();
         }
 
         private void InitializeTrackers()
@@ -22,6 +24,7 @@ namespace Wincognize
             m_trackers = new List<Tracker>();
             m_trackers.Add(new MouseTracker());
             m_trackers.Add(new KeyboardTracker());
+            m_trackers.Add(new BrowsingHistoryTracker());
             m_trackers.ForEach(t => t.Enable());
         }
 

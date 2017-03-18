@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Wincognize.Data;
+﻿using Wincognize.Data;
 using Wincognize.Hooking.Mouse;
 
 namespace Wincognize.Tracking
@@ -13,6 +12,8 @@ namespace Wincognize.Tracking
             m_hook = new MouseHook(MouseProcCallback);
         }
 
+        #region Tracker Implementation
+
         protected override void DisposeManaged() { }
 
         protected override void DisposeUnmanaged()
@@ -24,13 +25,15 @@ namespace Wincognize.Tracking
 
         protected override void PEnable() { }
 
+        #endregion
+
         private void MouseProcCallback(MouseAction wParam, MouseProc lParam)
         {
             if (!m_enabled)
                 return;
             if (wParam != MouseAction.WM_MOUSEMOVE)
             {
-                Database.Instance.ExecuteNonQuery($@"
+                Database.Main.ExecuteNonQuery($@"
                 INSERT INTO Mouse (action, location, data, flags, timestamp, extrainfo)
                 VALUES ({wParam}, {lParam.Location}, {lParam.Data}, {lParam.Flags}, {lParam.Timestamp}, {lParam.ExtraInfo})
                 ");
