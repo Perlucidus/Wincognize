@@ -16,14 +16,14 @@ namespace Wincognize
         {
             Application.ApplicationExit += OnApplicationExit;
             Application.ThreadException += OnThreadException;
-            //InitializeTrackers();
+            InitializeTrackers();
         }
 
         private void InitializeTrackers()
         {
             m_trackers = new List<Tracker>();
-            m_trackers.Add(new MouseTracker());
-            m_trackers.Add(new KeyboardTracker());
+            //m_trackers.Add(new MouseTracker());
+            //m_trackers.Add(new KeyboardTracker());
             m_trackers.Add(new BrowsingHistoryTracker());
             m_trackers.ForEach(t => t.Enable());
         }

@@ -18,7 +18,7 @@ namespace Wincognize.Tracking
         {
             m_cts = new CancellationTokenSource();
             m_task = new Task(Update, m_cts.Token);
-            m_lastUpdate = DateTime.Now;
+            m_lastUpdate = DateTime.UtcNow;
         }
 
         #region Tracker Implementation
@@ -44,22 +44,22 @@ namespace Wincognize.Tracking
             CancellationToken cts = (CancellationToken)obj;
             while (!cts.IsCancellationRequested)
             {
-                //todo check datetime
                 //Update Google Chrome browsing history
                 string google = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Google\Chrome\User Data\Default\History";
                 string fileName = "chromehistory.sqlite";
                 string path = $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\Wincognize\{fileName}";
                 File.Copy(google, path, true);
-                using (PreparedStatement ps = new Database($"Data Source={path};Version=3;Compress=true;").PrepareStatement("select * from urls order by last_visit_time desc"))
+                using (PreparedStatement ps = new Database($"Data Source={path};Version=3;Compress=true;").PrepareStatement($"SELECT * FROM urls WHERE last_visit_time > {m_lastUpdate.ToFileTimeUtc() / 10} ORDER BY last_visit_time DESC"))
                 using (ResultSet rs = ps.ExecuteQuery())
                     //url,title,visit_count,last_visit_time
                     while (rs.NextRow())
-                        Database.Main.ExecuteNonQuery($"insert into `history` (url, last_visit_time) values ('{StringUtilities.ToLiteral(rs.Get<string>("url"))}', '{rs.Get<ulong>("last_visit_time")}')");
+                        Database.Main.ExecuteNonQuery($"INSERT INTO History (url, visit_time) VALUES ('{StringUtilities.ToLiteral(rs.Get<string>("url"))}', '{rs.Get<ulong>("last_visit_time")*10}')");
                 //Update Internet Explorer browsing history
                 UrlHistoryWrapperClass urlhistory = new UrlHistoryWrapperClass();
                 foreach (STATURL staturl in urlhistory)
-                    Database.Main.ExecuteNonQuery($"insert into `history` (url, last_visit_time) values ('{StringUtilities.ToLiteral(staturl.URL)}', '{staturl.LastVisited}')");
-                m_lastUpdate = DateTime.Now;
+                    if (staturl.LastVisited > m_lastUpdate && staturl.URL.StartsWith("http"))
+                        Database.Main.ExecuteNonQuery($"INSERT INTO History (url, visit_time) VALUES ('{StringUtilities.ToLiteral(staturl.URL)}', '{staturl.LastVisited.ToFileTimeUtc()}')");
+                m_lastUpdate = DateTime.UtcNow;
                 await Task.Delay(DelayInterval);
             }
         }
