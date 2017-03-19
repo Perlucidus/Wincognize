@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Windows.Forms;
-using Wincognize.Data;
 using Wincognize.Tracking;
 
 namespace Wincognize

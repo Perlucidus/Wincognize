@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Wincognize.Tracking
 {
@@ -11,6 +7,7 @@ namespace Wincognize.Tracking
         protected bool m_enabled = false;
 
         #region IDisposable Support
+
         private bool disposedValue = false;
 
         protected abstract void DisposeManaged();
@@ -37,6 +34,7 @@ namespace Wincognize.Tracking
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         #endregion
 
         public void Enable()
