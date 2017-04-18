@@ -6,10 +6,10 @@ namespace Wincognize.Hooking.Keyboard
     [StructLayout(LayoutKind.Sequential)]
     public struct KeyboardProc
     {
-        public uint VirtualKeyCode;
-        public uint HardwareScanCode;
+        public int VirtualKeyCode;
+        public int HardwareScanCode;
         public KeyState Flags;
-        public uint Timestamp;
+        public int Timestamp;
         public IntPtr ExtraInfo;
     }
 }

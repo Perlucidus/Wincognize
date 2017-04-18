@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
+using Wincognize.Processing;
 using Wincognize.Tracking;
 
 namespace Wincognize
@@ -9,21 +10,27 @@ namespace Wincognize
     public class Context : ApplicationContext
     {
         private List<Tracker> m_trackers;
+        private List<Processor> m_processors;
 
         public Context()
         {
             Application.ApplicationExit += OnApplicationExit;
             Application.ThreadException += OnThreadException;
-            InitializeTrackers();
+            Initialize();
         }
 
-        private void InitializeTrackers()
+        private void Initialize()
         {
-            m_trackers = new List<Tracker>();
-            //m_trackers.Add(new MouseTracker());
-            //m_trackers.Add(new KeyboardTracker());
-            m_trackers.Add(new BrowsingHistoryTracker());
-            m_trackers.ForEach(t => t.Enable());
+            (m_trackers = new List<Tracker>
+            {
+                //new MouseTracker(),
+                new KeyboardTracker(),
+                //new BrowsingHistoryTracker()
+            }).ForEach(t => t.Enable());
+            (m_processors = new List<Processor>
+            {
+                new KeyboardProcessor()
+            }).ForEach(p => p.Enable());
         }
 
         private void OnThreadException(Object sender, ThreadExceptionEventArgs e)

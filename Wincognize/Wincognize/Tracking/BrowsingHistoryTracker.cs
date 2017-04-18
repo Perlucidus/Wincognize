@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,16 +50,17 @@ namespace Wincognize.Tracking
                 string fileName = "chromehistory.sqlite";
                 string path = $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\Wincognize\{fileName}";
                 File.Copy(google, path, true);
-                using (PreparedStatement ps = new Database($"Data Source={path};Version=3;Compress=true;").PrepareStatement($"SELECT * FROM urls WHERE last_visit_time > {m_lastUpdate.ToFileTimeUtc() / 10} ORDER BY last_visit_time DESC"))
-                using (ResultSet rs = ps.ExecuteQuery())
-                    //url,title,visit_count,last_visit_time
-                    while (rs.NextRow())
-                        Database.Main.ExecuteNonQuery($"INSERT INTO History (url, visit_time) VALUES ('{StringUtilities.ToLiteral(rs.Get<string>("url"))}', '{rs.Get<ulong>("last_visit_time")*10}')");
+                using (var con = new SQLiteConnection($"Data Source={path};Version=3;Compress=true;"))
+                using (var cmd = new SQLiteCommand($"SELECT * FROM urls WHERE last_visit_time > {m_lastUpdate.ToFileTimeUtc() / 10} ORDER BY last_visit_time DESC", con))
+                using (var reader = cmd.ExecuteReader())
+                    while (reader.Read())
+                        DataContext.Main.BrowsingHistory.Add(new BrowsingHistory { URL = (string)reader["url"], VisitTime = (long)reader["last_visit_time"] * 10 });
                 //Update Internet Explorer browsing history
                 UrlHistoryWrapperClass urlhistory = new UrlHistoryWrapperClass();
                 foreach (STATURL staturl in urlhistory)
                     if (staturl.LastVisited > m_lastUpdate && staturl.URL.StartsWith("http"))
-                        Database.Main.ExecuteNonQuery($"INSERT INTO History (url, visit_time) VALUES ('{StringUtilities.ToLiteral(staturl.URL)}', '{staturl.LastVisited.ToFileTimeUtc()}')");
+                        DataContext.Main.BrowsingHistory.Add(new BrowsingHistory { URL = staturl.URL, VisitTime = staturl.LastVisited.ToFileTimeUtc() });
+                DataContext.Main.SaveChanges();
                 m_lastUpdate = DateTime.UtcNow;
                 await Task.Delay(DelayInterval);
             }

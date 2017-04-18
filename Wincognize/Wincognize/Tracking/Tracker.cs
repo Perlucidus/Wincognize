@@ -41,8 +41,8 @@ namespace Wincognize.Tracking
         {
             if (!m_enabled)
             {
-                PEnable();
                 m_enabled = true;
+                PEnable();
             }
         }
 
@@ -50,8 +50,8 @@ namespace Wincognize.Tracking
         {
             if (m_enabled)
             {
-                PDisable();
                 m_enabled = false;
+                PDisable();
             }
         }
 

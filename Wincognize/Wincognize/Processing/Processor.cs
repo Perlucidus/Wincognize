@@ -1,13 +1,22 @@
-﻿namespace Wincognize.Processing
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Wincognize.Processing
 {
     public abstract class Processor
     {
-        public int Match { get; protected set; }
+        public double Approximation { get; protected set; }
+        private Task m_task;
+        private CancellationTokenSource m_cts;
+        private int m_interval;
         private bool m_enabled;
 
-        public Processor()
+        public Processor(int interval)
         {
-            Match = 0;
+            Approximation = 0;
+            m_cts = new CancellationTokenSource();
+            m_task = new Task(Trigger, m_cts.Token);
+            m_interval = interval;
             m_enabled = false;
         }
 
@@ -15,7 +24,7 @@
         {
             if (!m_enabled)
             {
-                PEnable();
+                m_task.Start();
                 m_enabled = true;
             }
         }
@@ -24,12 +33,21 @@
         {
             if (m_enabled)
             {
-                PDisable();
+                m_cts.Cancel();
                 m_enabled = false;
             }
         }
 
-        protected abstract void PEnable();
-        protected abstract void PDisable();
+        private async void Trigger(object obj)
+        {
+            CancellationToken cts = (CancellationToken)obj;
+            while (!cts.IsCancellationRequested)
+            {
+                Process();
+                await Task.Delay(m_interval);
+            }
+        }
+
+        protected abstract void Process();
     }
 }

@@ -1,45 +1,26 @@
-﻿using System;
-using System.Data.SQLite;
-using System.IO;
+﻿using System.Data.Entity;
 
 namespace Wincognize.Data
 {
-    public class Database
+    public class DataContext : DbContext
     {
-        public static Database Main;
+        public static DataContext Main;
 
-        private const string FilePath = @"{0}\Wincognize";
-        private const string FileName = "data.sqlite";
-        private const int SqliteVersion = 3;
+        public DbSet<Keyboard> Keyboard { get; set; }
+        public DbSet<Mouse> Mouse { get; set; }
+        public DbSet<BrowsingHistory> BrowsingHistory { get; set; }
 
-        private SQLiteConnection m_connection;
-
-        static Database()
+        static DataContext()
         {
-            //Initialize main database
-            string dir = string.Format(FilePath, Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
-            string path = $@"{dir}\{FileName}";
-            Directory.CreateDirectory(dir);
-            if (!File.Exists(path))
-                SQLiteConnection.CreateFile(path);
-            Main = new Database($"Data Source={path};Version={SqliteVersion};");
+            Main = new DataContext();
         }
 
-        public Database(string conStr)
-        {
-            m_connection = new SQLiteConnection(conStr);
-            m_connection.Open();
-        }
+        private DataContext() : base("Data Source=(localdb)\\MSSQLLocalDB;Database=Wincognize;Integrated Security=SSPI;") { }
 
-        public PreparedStatement PrepareStatement(string ps)
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            return new PreparedStatement(m_connection, ps);
-        }
-
-        public void ExecuteNonQuery(string sql)
-        {
-            using (PreparedStatement ps = PrepareStatement(sql))
-                ps.ExecuteNonQuery();
+            Database.SetInitializer<DataContext>(null);
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

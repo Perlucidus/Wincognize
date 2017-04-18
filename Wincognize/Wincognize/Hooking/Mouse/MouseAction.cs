@@ -2,7 +2,7 @@
 
 namespace Wincognize.Hooking.Mouse
 {
-    public enum MouseAction : UInt32
+    public enum MouseAction : Int32
     {
         WM_MOUSEFIRST = 0x200,
         WM_MOUSEMOVE = 0x200,

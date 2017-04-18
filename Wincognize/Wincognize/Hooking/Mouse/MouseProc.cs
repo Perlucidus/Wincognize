@@ -7,9 +7,9 @@ namespace Wincognize.Hooking.Mouse
     public struct MouseProc
     {
         public POINT Location;
-        public uint Data;
+        public int Data;
         public MouseState Flags;
-        public uint Timestamp;
+        public int Timestamp;
         public IntPtr ExtraInfo;
     }
 }

@@ -10,6 +10,7 @@ namespace Wincognize.Tracking
         public KeyboardTracker()
         {
             m_hook = new KeyboardHook(KeyboardProcCallback);
+            m_hook.Hook();
         }
 
         #region Tracker Implementation
@@ -29,10 +30,19 @@ namespace Wincognize.Tracking
 
         private void KeyboardProcCallback(KeyboardAction wParam, KeyboardProc lParam)
         {
-            Database.Main.ExecuteNonQuery($@"
-                INSERT INTO Keyboard (action, vkCode, hwsCode, flags, timestamp, extrainfo)
-                VALUES ({wParam}, {lParam.VirtualKeyCode}, {lParam.HardwareScanCode}, {lParam.Flags}, {lParam.Timestamp}, {lParam.ExtraInfo})
-            ");
+            if (!m_enabled)
+                return;
+            DataContext.Main.Keyboard.Add(
+                new Keyboard
+                {
+                    Action = (int)wParam,
+                    VkCode = lParam.VirtualKeyCode,
+                    HwsCode = lParam.HardwareScanCode,
+                    Flags = (int)lParam.Flags,
+                    Timestamp = lParam.Timestamp,
+                    ExtraInfo = lParam.ExtraInfo.ToInt32()
+                });
+            DataContext.Main.SaveChanges();
         }
     }
 }
