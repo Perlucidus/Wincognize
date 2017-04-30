@@ -1,4 +1,5 @@
-﻿using Wincognize.Data;
+﻿using System;
+using Wincognize.Data;
 using Wincognize.Hooking.Mouse;
 
 namespace Wincognize.Tracking
@@ -6,10 +7,12 @@ namespace Wincognize.Tracking
     public class MouseTracker : Tracker
     {
         private MouseHook m_hook;
+        private DateTime m_lastMove;
 
         public MouseTracker()
         {
             m_hook = new MouseHook(MouseProcCallback);
+            m_lastMove = DateTime.Now;
             m_hook.Hook();
         }
 
@@ -32,20 +35,23 @@ namespace Wincognize.Tracking
         {
             if (!m_enabled)
                 return;
-            //if (wParam == MouseAction.WM_MOUSEMOVE)
-            //    return;
-            DataContext.Main.Mouse.Add(
-                new Mouse
-                {
-                    Action = (int)wParam,
-                    X = lParam.Location.x,
-                    Y = lParam.Location.y,
-                    Data = lParam.Data,
-                    Flags = (int)lParam.Flags,
-                    Timestamp = lParam.Timestamp,
-                    ExtraInfo = lParam.ExtraInfo.ToInt32()
-                });
-            DataContext.Main.SaveChanges();
+            if (wParam == MouseAction.WM_MOUSEMOVE && (DateTime.Now - m_lastMove).TotalMilliseconds < 10)
+                return;
+            lock (DataContext.Main)
+            {
+                DataContext.Main.Mouse.Add(
+                    new Mouse
+                    {
+                        Action = (int)wParam,
+                        X = lParam.Location.x,
+                        Y = lParam.Location.y,
+                        Data = lParam.Data,
+                        Flags = (int)lParam.Flags,
+                        Timestamp = lParam.Timestamp,
+                        ExtraInfo = lParam.ExtraInfo.ToInt32()
+                    });
+                DataContext.Main.SaveChanges();
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using Wincognize.Processing;
@@ -12,8 +13,14 @@ namespace Wincognize
         private List<Tracker> m_trackers;
         private List<Processor> m_processors;
 
+        [DllImport("kernel32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
+
         public Context()
         {
+            MainForm = new Form();
+            AllocConsole();
             Application.ApplicationExit += OnApplicationExit;
             Application.ThreadException += OnThreadException;
             Initialize();
@@ -23,13 +30,17 @@ namespace Wincognize
         {
             (m_trackers = new List<Tracker>
             {
-                //new MouseTracker(),
+#if !DEBUG
+                new MouseTracker(),
+#endif
                 new KeyboardTracker(),
-                //new BrowsingHistoryTracker()
+                new BrowsingHistoryTracker()
             }).ForEach(t => t.Enable());
             (m_processors = new List<Processor>
             {
-                new KeyboardProcessor()
+                new MouseProcessor(),
+                new KeyboardProcessor(),
+                new BrowsingHistoryProcessor()
             }).ForEach(p => p.Enable());
         }
 

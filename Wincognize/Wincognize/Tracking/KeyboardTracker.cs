@@ -32,17 +32,20 @@ namespace Wincognize.Tracking
         {
             if (!m_enabled)
                 return;
-            DataContext.Main.Keyboard.Add(
-                new Keyboard
-                {
-                    Action = (int)wParam,
-                    VkCode = lParam.VirtualKeyCode,
-                    HwsCode = lParam.HardwareScanCode,
-                    Flags = (int)lParam.Flags,
-                    Timestamp = lParam.Timestamp,
-                    ExtraInfo = lParam.ExtraInfo.ToInt32()
-                });
-            DataContext.Main.SaveChanges();
+            lock (DataContext.Main)
+            {
+                DataContext.Main.Keyboard.Add(
+                    new Keyboard
+                    {
+                        Action = (int)wParam,
+                        VkCode = lParam.VirtualKeyCode,
+                        HwsCode = lParam.HardwareScanCode,
+                        Flags = (int)lParam.Flags,
+                        Timestamp = lParam.Timestamp,
+                        ExtraInfo = lParam.ExtraInfo.ToInt32()
+                    });
+                DataContext.Main.SaveChanges();
+            }
         }
     }
 }

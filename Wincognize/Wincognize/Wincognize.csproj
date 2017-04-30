@@ -80,7 +80,9 @@
     <Compile Include="Hooking\Mouse\MouseState.cs" />
     <Compile Include="Hooking\Mouse\POINT.cs" />
     <Compile Include="Hooking\WindowsHook.cs" />
+    <Compile Include="Processing\BrowsingHistoryProcessor.cs" />
     <Compile Include="Processing\KeyboardProcessor.cs" />
+    <Compile Include="Processing\MouseProcessor.cs" />
     <Compile Include="Processing\Processor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
