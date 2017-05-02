@@ -7,7 +7,7 @@ namespace Wincognize.Processing
 {
     public class KeyboardProcessor : Processor
     {
-        private const int MinResults = 5000;
+        private const int MinResults = 200;
 
         public KeyboardProcessor() : base(10000) { }
 
@@ -30,7 +30,7 @@ namespace Wincognize.Processing
             intervals2.Sort();
             double median1 = intervals1[intervals1.Count() / 2];
             double median2 = intervals2[intervals2.Count() / 2];
-            Approximation = (Math.Max(median1, median2) - Math.Min(median1, median2)) / Math.Max(median1, median2);
+            Approximation = Math.Min(1, Math.Abs((median2 - median1) / median2));
             Console.WriteLine($"Keyboard: {Approximation}");
         }
     }

@@ -10,8 +10,8 @@ namespace Wincognize
 {
     public class Context : ApplicationContext
     {
-        private List<Tracker> m_trackers;
-        private List<Processor> m_processors;
+        public List<Tracker> Trackers;
+        public List<Processor> Processors;
 
         [DllImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -28,15 +28,14 @@ namespace Wincognize
 
         private void Initialize()
         {
-            (m_trackers = new List<Tracker>
+            (Trackers = new List<Tracker>
             {
-#if !DEBUG
+                new StatusTracker(),
                 new MouseTracker(),
-#endif
                 new KeyboardTracker(),
                 new BrowsingHistoryTracker()
             }).ForEach(t => t.Enable());
-            (m_processors = new List<Processor>
+            (Processors = new List<Processor>
             {
                 new MouseProcessor(),
                 new KeyboardProcessor(),
@@ -52,8 +51,8 @@ namespace Wincognize
         private void OnApplicationExit(Object sender, EventArgs e)
         {
             Console.WriteLine("Application Exit");
-            m_trackers.ForEach(t => t.Disable());
-            m_trackers.Clear();
+            Trackers.ForEach(t => t.Disable());
+            Trackers.Clear();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Wincognize.Processing
 {
     public class MouseProcessor : Processor
     {
-        private const int MinResults = 5000;
+        private const int MinResults = 200;
 
         public MouseProcessor() : base(10000) { }
 
@@ -18,7 +18,7 @@ namespace Wincognize.Processing
             lock (DataContext.Main)
             {
                 all = DataContext.Main.Mouse
-                    .Where(k => k.Timestamp > 0 && k.Action == (int)MouseAction.WM_MOUSEMOVE)
+                    .Where(k => k.Action == (int)MouseAction.WM_MOUSEMOVE)
                     .OrderBy(k => k.Timestamp).ToList();
             }
             if (all.Count() < MinResults)
@@ -35,7 +35,7 @@ namespace Wincognize.Processing
             distances2.Sort();
             double median1 = distances1[distances1.Count() / 2];
             double median2 = distances2[distances2.Count() / 2];
-            Approximation = (Math.Max(median1, median2) - Math.Min(median1, median2)) / Math.Max(median1, median2);
+            Approximation = Math.Min(1, Math.Abs((median2 - median1) / median2));
             Console.WriteLine($"Mouse: {Approximation}");
         }
 

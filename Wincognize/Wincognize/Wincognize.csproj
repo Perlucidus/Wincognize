@@ -90,6 +90,7 @@
     <Compile Include="Tracking\BrowsingHistoryTracker.cs" />
     <Compile Include="Tracking\KeyboardTracker.cs" />
     <Compile Include="Tracking\MouseTracker.cs" />
+    <Compile Include="Tracking\StatusTracker.cs" />
     <Compile Include="Tracking\Tracker.cs" />
     <Compile Include="urlhist.cs" />
     <Compile Include="UrlHistoryWrapper.cs" />

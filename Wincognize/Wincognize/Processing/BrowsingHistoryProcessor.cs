@@ -7,7 +7,7 @@ namespace Wincognize.Processing
 {
     public class BrowsingHistoryProcessor : Processor
     {
-        private const int MinResults = 3000;
+        private const int MinResults = 10;
 
         public BrowsingHistoryProcessor() : base(10000) { }
 
@@ -15,10 +15,11 @@ namespace Wincognize.Processing
         {
             List<BrowsingHistory> all;
             lock (DataContext.Main)
-                all = DataContext.Main.BrowsingHistory.Where(k => k.VisitTime > 0).OrderBy(k => k.VisitTime).ToList();
+                all = DataContext.Main.BrowsingHistory.OrderBy(k => k.VisitTime).ToList();
             if (all.Count() < MinResults)
                 return;
             List<BrowsingHistory> last = all.Skip(Math.Max(0, all.Count() - MinResults)).ToList();
+            IEnumerable<string> unique = last.GroupBy(h => h.URL).Select(g => g.Key);
             Dictionary<string, int> visits1 = new Dictionary<string, int>();
             Dictionary<string, int> visits2 = new Dictionary<string, int>();
             for (int i = 1; i < last.Count(); i++)
@@ -39,13 +40,14 @@ namespace Wincognize.Processing
                 }
             }
             double approxSum = 0;
-            foreach (BrowsingHistory history in last)
+            foreach (string url in unique)
             {
-                int visited1 = visits1.ContainsKey(history.URL) ? visits1[history.URL] : 0;
-                int visited2 = visits2.ContainsKey(history.URL) ? visits2[history.URL] : 0;
-                approxSum += (Math.Max(visited1, visited2) - Math.Min(visited1, visited2)) / Math.Max(visited1, visited2);
+                int visited1 = visits1.ContainsKey(url) ? visits1[url] : 0;
+                int visited2 = visits2.ContainsKey(url) ? visits2[url] : 0;
+                approxSum += Math.Abs((visited2 - visited1) / visited2);
             }
-            Approximation = approxSum / last.Count();
+            Approximation = Math.Min(1, approxSum / unique.Count());
+            Console.WriteLine($"Browsing History: {Approximation}");
         }
     }
 }

@@ -5,6 +5,8 @@ namespace Wincognize
 {
     static class Program
     {
+        public static Context MainContext;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -13,7 +15,7 @@ namespace Wincognize
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Context());
+            Application.Run(MainContext = new Context());
         }
     }
 }
