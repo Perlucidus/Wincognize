@@ -19,6 +19,7 @@ namespace Wincognize.Data
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            //Set custom initializer
             Database.SetInitializer<DataContext>(null);
             base.OnModelCreating(modelBuilder);
         }

@@ -34,6 +34,7 @@ namespace Wincognize.Tracking
                 return;
             lock (DataContext.Main)
             {
+                //Insert keyboard action into database
                 DataContext.Main.Keyboard.Add(
                     new Keyboard
                     {

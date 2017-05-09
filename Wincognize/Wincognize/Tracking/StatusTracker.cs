@@ -7,7 +7,7 @@ namespace Wincognize.Tracking
 {
     public class StatusTracker : Tracker
     {
-        private const int DelayInterval = 10000;
+        private const int DelayInterval = 10000; //Task execute interval
         private Task m_task;
         private CancellationTokenSource m_cts;
 
@@ -40,6 +40,7 @@ namespace Wincognize.Tracking
             CancellationToken cts = (CancellationToken)obj;
             while (!cts.IsCancellationRequested)
             {
+                //Calculate average of processor approximations
                 double avgApprox = Program.MainContext.Processors.Select(p => p.Approximation).Average();
                 Console.WriteLine($"Total: {avgApprox}");
                 if (avgApprox > 0.6)

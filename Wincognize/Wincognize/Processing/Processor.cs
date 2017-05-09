@@ -5,10 +5,10 @@ namespace Wincognize.Processing
 {
     public abstract class Processor
     {
-        public double Approximation { get; protected set; }
+        public double Approximation { get; protected set; } //Approximation error of data comparison
         private Task m_task;
         private CancellationTokenSource m_cts;
-        private int m_interval;
+        private int m_interval; //Task execute interval
         private bool m_enabled;
 
         public Processor(int interval)

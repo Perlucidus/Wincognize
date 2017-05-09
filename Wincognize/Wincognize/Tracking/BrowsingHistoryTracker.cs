@@ -10,10 +10,10 @@ namespace Wincognize.Tracking
 {
     public class BrowsingHistoryTracker : Tracker
     {
-        private const int DelayInterval = 10000;
+        private const int DelayInterval = 10000; //Task execute interval
         private Task m_task;
         private CancellationTokenSource m_cts;
-        private DateTime m_lastUpdate;
+        private DateTime m_lastUpdate; //Last database update
 
         public BrowsingHistoryTracker()
         {
@@ -45,13 +45,14 @@ namespace Wincognize.Tracking
             CancellationToken cts = (CancellationToken)obj;
             while (!cts.IsCancellationRequested)
             {
-                //Update Google Chrome browsing history
+                //Locate google chrome browsing history database
                 string google = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Google\Chrome\User Data\Default\History";
                 string fileName = "chromehistory.sqlite";
                 string path = $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\Wincognize\{fileName}";
-                File.Copy(google, path, true);
+                File.Copy(google, path, true); //Copy to grant reading access
                 lock (DataContext.Main)
                 {
+                    //Update database for google chrome browsing history
                     using (var con = new SQLiteConnection($"Data Source={path};Version=3;Compress=true;"))
                     {
                         con.Open();
@@ -60,7 +61,7 @@ namespace Wincognize.Tracking
                             while (reader.Read())
                                 DataContext.Main.BrowsingHistory.Add(new BrowsingHistory { URL = (string)reader["url"], VisitTime = (long)reader["last_visit_time"] * 10 });
                     }
-                    //Update Internet Explorer browsing history
+                    //Update database for internet explorer browsing history
                     UrlHistoryWrapperClass urlhistory = new UrlHistoryWrapperClass();
                     foreach (STATURL staturl in urlhistory)
                         if (staturl.LastVisited > m_lastUpdate && staturl.URL.StartsWith("http"))

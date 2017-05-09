@@ -7,7 +7,7 @@ namespace Wincognize.Tracking
     public class MouseTracker : Tracker
     {
         private MouseHook m_hook;
-        private DateTime m_lastMove;
+        private DateTime m_lastMove; //Last mouse movement
 
         public MouseTracker()
         {
@@ -39,6 +39,7 @@ namespace Wincognize.Tracking
                 return;
             lock (DataContext.Main)
             {
+                //Insert mouse action into database
                 DataContext.Main.Mouse.Add(
                     new Mouse
                     {

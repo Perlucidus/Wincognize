@@ -19,8 +19,9 @@ namespace Wincognize
 
         public Context()
         {
-            MainForm = new Form();
-            AllocConsole();
+#if DEBUG
+            AllocConsole(); //Create console for debugging purposes
+#endif
             Application.ApplicationExit += OnApplicationExit;
             Application.ThreadException += OnThreadException;
             Initialize();
@@ -28,6 +29,7 @@ namespace Wincognize
 
         private void Initialize()
         {
+            //Create instances of each tracker and enable all of them
             (Trackers = new List<Tracker>
             {
                 new StatusTracker(),
@@ -35,6 +37,7 @@ namespace Wincognize
                 new KeyboardTracker(),
                 new BrowsingHistoryTracker()
             }).ForEach(t => t.Enable());
+            //Create instance of each processor and enable all of them
             (Processors = new List<Processor>
             {
                 new MouseProcessor(),

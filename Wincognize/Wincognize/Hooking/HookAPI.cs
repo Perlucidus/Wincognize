@@ -5,6 +5,7 @@ namespace Wincognize.Hooking
 {
     public static class HookAPI
     {
+        //Delegate for Hook Callback
         public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
